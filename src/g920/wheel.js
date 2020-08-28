@@ -3,7 +3,7 @@ import flatstore from 'flatstore';
 class Wheel extends Component {
 
     render() {
-        let degrees = this.props.rotation * 900;
+        let degrees = this.props.rotation * 450;
         let wheelStyle = {
             //width: '400px',
             transform: 'rotate(' + degrees + 'deg)'

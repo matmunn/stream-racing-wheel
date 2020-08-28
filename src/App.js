@@ -18,8 +18,6 @@ class App extends Component {
   constructor(props) {
     super(props)
 
-    this.gamePads = {};
-
     this.start = 0;
     this.a = 0;
     this.b = 0;
@@ -27,35 +25,28 @@ class App extends Component {
     this.gamePadIndex = -1;
 
     this.state = {
-      gameLoopStarted: false
+      gameLoopStarted: false,
+      gamePads: [],
     }
 
-    this.gameLoop = this.gameLoop.bind(this);
-    this.onGamepadConnected = this.onGamepadConnected.bind(this);
     window.addEventListener("gamepadconnected", this.onGamepadConnected);
   }
 
-  onGamepadConnected(e) {
-    var gp = navigator.getGamepads()[e.gamepad.index];
+  onGamepadConnected = (e) => {
+    const pads = navigator.getGamepads()
+    const gp = pads[e.gamepad.index];
     console.log(
       "Gamepad connected at index %d: %s. %d buttons, %d axes.",
       gp.index, gp.id, gp.buttons.length, gp.axes.length
     );
-    this.gamePads[gp.index] = gp;
-    this.setState({ gamePads: this.gamePads })
+    this.setState({ gamePads: pads })
     if (gp.id.toLowerCase().indexOf("wheel") > -1) {
       this.changeGamepad(gp.index);
     }
   }
 
-  onChange(e) {
-    this.changeGamepad(e.target.value);
-
-  }
-
   changeGamepad(id) {
     console.log(id);
-    this.gamePadIndex = id;
     this.setState({ gamepadIndex: id, gameLoopStarted: true })
     this.gameLoop();
   }
@@ -63,18 +54,14 @@ class App extends Component {
   render() {
     //let gamepads = navigator.getGamepads();
     //console.log(gamepads)
-    var options = Object.values(this.gamePads).map(gp => {
-
-      let isSelected = gp.index === this.gamePadIndex;
-      return (<option selected={isSelected} value={gp.index}>{gp.id}</option>)
-
-    }
-    );
-
     return (
       <div style={{ paddingLeft: '50px', backgroundColor: '#133a4d' }}>
-        <select name="gamepadSelection" onChange={(e) => { this.onChange(e) }}>
-          {options}
+        <select onChange={(e) => this.changeGamepad(e.target.value)} value={this.state.gamepadIndex}>
+          {
+            Object.values(this.state.gamePads).map(gp => (
+              <option value={gp.index}>{gp.id}</option>
+            ))
+          }
         </select>
         <br />
         <div style={{ position: 'relative', top: '20px', }}>
@@ -83,10 +70,7 @@ class App extends Component {
         <div style={{ position: 'relative', top: '-170px', left: "30px", 'marginLeft': '50px' }}>
           <Pedals />
         </div>
-
-
       </div>
-
     )
   }
 
@@ -107,12 +91,15 @@ class App extends Component {
       pressed: gp.buttons[item].pressed,
       touched: gp.buttons[item].touched,
       value: gp.buttons[item].value,
-    });
+    }));
     const axesStates = gp.axes.map(item => gp.axes[item]);
 
     flatstore.set("buttons", buttonStates);
     flatstore.set("axes", axesStates);
 
+    if (this.start) {
+      cancelAnimationFrame(this.start);
+    }
     this.start = requestAnimationFrame(this.gameLoop);
   }
 }
