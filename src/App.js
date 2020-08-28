@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 
 import Wheel from './g920/wheel';
 import Pedals from './g920/pedals';
-import ShifterBase from './g920/shifterbase';
 
 import flatstore from 'flatstore';
 
@@ -81,9 +80,6 @@ class App extends Component {
         <div style={{ position: 'relative', top: '20px', }}>
           <Wheel axis={0} />
         </div>
-        <div style={{ position: 'relative', top: '-300px', left: "500px", 'marginLeft': '50px' }}>
-          <ShifterBase />
-        </div>
         <div style={{ position: 'relative', top: '-170px', left: "30px", 'marginLeft': '50px' }}>
           <Pedals />
         </div>
@@ -107,16 +103,11 @@ class App extends Component {
 
     //var gp = this.gamePads[this.gamePadIndex];
     var gp = navigator.getGamepads()[this.gamePadIndex];
-    let buttonStates = [];
-    for (let i = 0; i < gp.buttons.length; i++) {
-      let button = gp.buttons[i];
-      let buttonState = {
-        pressed: button.pressed,
-        touched: button.touched,
-        value: button.value
-      }
-      buttonStates.push(buttonState);
-    }
+    const buttonStates = gp.buttons.map(item => ({
+      pressed: gp.buttons[item].pressed,
+      touched: gp.buttons[item].touched,
+      value: gp.buttons[item].value,
+    })
 
     let axesStates = [];
     for (let i = 0; i < gp.axes.length; i++) {
