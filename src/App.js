@@ -107,13 +107,8 @@ class App extends Component {
       pressed: gp.buttons[item].pressed,
       touched: gp.buttons[item].touched,
       value: gp.buttons[item].value,
-    })
-
-    let axesStates = [];
-    for (let i = 0; i < gp.axes.length; i++) {
-      let axis = gp.axes[i];
-      axesStates.push(axis);
-    }
+    });
+    const axesStates = gp.axes.map(item => gp.axes[item]);
 
     flatstore.set("buttons", buttonStates);
     flatstore.set("axes", axesStates);
